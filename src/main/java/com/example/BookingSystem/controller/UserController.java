@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,11 +34,13 @@ public class UserController {
             return ResponseEntity.badRequest().body("Username already exists");
         }
 
+//        System.out.println("\n "+req.role());
+
         UserEntity user = new UserEntity();
         user.setUsername(req.username());
         user.setPassword(passwordEncoder.encode(req.password()));
-        user.setRole("USER");
-
+//        user.setRole("USER");
+        user.setRole(req.role());
         userRepository.save(user);
 
         return ResponseEntity.ok("User created");
@@ -55,8 +56,16 @@ public class UserController {
                 )
         );
 
-        String token = jwtService.generateToken(req.username());
+        UserEntity user = userRepository.findByUsername(req.username())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String token = jwtService.generateToken(
+                user.getUsername(),
+                user.getRole()   // IMPORTANT
+        );
 
         return ResponseEntity.ok(Map.of("token", token));
     }
+
+
 }

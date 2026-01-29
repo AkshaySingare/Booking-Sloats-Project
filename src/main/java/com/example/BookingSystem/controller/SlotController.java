@@ -17,7 +17,7 @@ public class SlotController {
 
     private final SlotRepository slotRepository;
 
-    @GetMapping("/test-admin")
+    @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> testAdmin() {
         return ResponseEntity.ok("ADMIN OK");
@@ -26,6 +26,8 @@ public class SlotController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Slot> createSlot(@RequestBody CreateSlotRequest request) {
+
+        System.out.println("\n Admin Sloat Api ");
 
         Slot slot = new Slot();
         slot.setStartTime(request.startTime());
